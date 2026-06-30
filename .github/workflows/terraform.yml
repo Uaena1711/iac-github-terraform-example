@@ -1,7 +1,7 @@
-# Paved-road consumer: drop this in your repo at .github/workflows/terraform.yml.
-# - pull request   -> plan preview (no apply)
-# - push to main   -> deploy (plan + apply; protected Environments gate apply)
-# - run manually   -> deploy, or destroy a chosen workspace (mode=destroy + dir)
+# Per-env consumer: one job per environment calling the catalog's tf-env reusable workflow.
+# dev = auto (its Environment has no reviewers); prod = approval (its Environment has a reviewer).
+# apply runs only when that env's plan has changes, so an unchanged prod never waits.
+# NOTE: pinned to a branch ref for a pre-merge live test; switch to @v1 after release.
 name: terraform
 
 on:
@@ -15,22 +15,24 @@ on:
         type: choice
         options: [deploy, destroy]
         default: deploy
-      dir:
-        description: workspace to destroy (required when mode=destroy, e.g. envs/dev)
-        type: string
-        default: ""
 
 permissions:
-  id-token: write   # required for keyless OIDC
+  id-token: write
   contents: read
 
 jobs:
-  terraform:
-    uses: Uaena1711/iac-github/.github/workflows/terraform.yml@terraform/v1
+  dev:
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/per-env-path-b
     with:
-      workspaces_root: envs
+      dir: envs/dev
+      environment: dev
       default_region: us-east-1
-      shared_paths: modules        # a change under modules/ re-plans every env
       mode: ${{ inputs.mode || 'deploy' }}
-      dir: ${{ inputs.dir || '' }}
-    # No `secrets: inherit` — the flow is fully keyless (OIDC).
+
+  prod:
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/per-env-path-b
+    with:
+      dir: envs/prod
+      environment: prod
+      default_region: us-east-1
+      mode: ${{ inputs.mode || 'deploy' }}
