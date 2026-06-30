@@ -30,6 +30,7 @@ jobs:
     with:
       workspaces_root: envs
       default_region: us-east-1
+      shared_paths: modules        # a change under modules/ re-plans every env
       mode: ${{ inputs.mode || 'deploy' }}
       dir: ${{ inputs.dir || '' }}
     # No `secrets: inherit` — the flow is fully keyless (OIDC).

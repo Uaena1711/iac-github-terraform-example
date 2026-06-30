@@ -1,8 +1,9 @@
-# Minimal, cheap, destroyable sample resource — proves the keyless OIDC + plan/apply flow.
-# NOTE: `String` is fine for this non-secret demo. For real secrets use `SecureString`
-# (or Secrets Manager) — and remember plan files can capture such values in cleartext.
-resource "aws_ssm_parameter" "demo" {
+# Thin environment: just wires inputs into the shared local module (source = a path).
+# A change under modules/ re-plans every env (the caller sets shared_paths: modules).
+module "demo" {
+  source = "../../modules/ssm-demo"
+
   name  = "/iac-github/demo/dev"
-  type  = "String"
   value = "hello-dev"
+  tags  = { env = "dev", managed_by = "iac-github" }
 }

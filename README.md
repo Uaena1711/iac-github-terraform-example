@@ -8,14 +8,18 @@ plan/apply/destroy with per-stack OIDC and Environment-gated approvals.
 
 ```
 .github/workflows/terraform.yml   # paved-road caller (calls the catalog reusable workflow)
+modules/
+  ssm-demo/  { main.tf, variables.tf, outputs.tf }   # shared local module
 envs/
-  dev/   { provider.tf, main.tf, tf-ci.env }
+  dev/   { provider.tf, main.tf, tf-ci.env }   # main.tf just calls ../../modules/ssm-demo
   prod/  { provider.tf, main.tf, tf-ci.env }
 ```
 
-Each directory under `envs/` is a **workspace**: it contains the marker file `provider.tf`
-and a `tf-ci.env` with that stack's identity. The catalog auto-detects which workspaces
-changed and runs them in parallel.
+Each directory under `envs/` is a **workspace**: it has the marker file `provider.tf` and a
+`tf-ci.env` with that stack's identity, and a thin `main.tf` that wires inputs into the
+shared **`modules/ssm-demo`** local module (`source = "../../modules/ssm-demo"`). The catalog
+auto-detects which workspaces changed and runs them in parallel; because the caller sets
+`shared_paths: modules`, a change to the module re-plans **every** environment.
 
 ## Setup
 
