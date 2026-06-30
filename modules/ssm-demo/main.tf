@@ -11,8 +11,9 @@ terraform {
 }
 
 resource "aws_ssm_parameter" "this" {
-  name  = var.name
-  type  = "String"
-  value = var.value
-  tags  = var.tags
+  name        = var.name
+  type        = "String"
+  value       = var.value
+  description = "managed by iac-github"
+  tags        = var.tags
 }
