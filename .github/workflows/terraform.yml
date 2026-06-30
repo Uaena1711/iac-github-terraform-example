@@ -1,0 +1,35 @@
+# Paved-road consumer: drop this in your repo at .github/workflows/terraform.yml.
+# - pull request   -> plan preview (no apply)
+# - push to main   -> deploy (plan + apply; protected Environments gate apply)
+# - run manually   -> deploy, or destroy a chosen workspace (mode=destroy + dir)
+name: terraform
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: deploy or destroy
+        type: choice
+        options: [deploy, destroy]
+        default: deploy
+      dir:
+        description: workspace to destroy (required when mode=destroy, e.g. envs/dev)
+        type: string
+        default: ""
+
+permissions:
+  id-token: write   # required for keyless OIDC
+  contents: read
+
+jobs:
+  terraform:
+    uses: Uaena1711/iac-github/.github/workflows/terraform.yml@terraform/v1
+    with:
+      workspaces_root: envs
+      default_region: us-east-1
+      mode: ${{ inputs.mode || 'deploy' }}
+      dir: ${{ inputs.dir || '' }}
+    # No `secrets: inherit` — the flow is fully keyless (OIDC).

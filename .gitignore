@@ -1,0 +1,8 @@
+# terraform / runtime junk
+**/.terraform/
+**/.terraform.lock.hcl
+**/*.tfstate
+**/*.tfstate.*
+**/plan.tfplan
+**/plan.status
+.DS_Store
