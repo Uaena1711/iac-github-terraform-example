@@ -1,0 +1,31 @@
+# TEMP probe: does actions/checkout + terraform work inside various job container images?
+# Determines whether per-job official (Alpine) tool images are viable on GitHub, or if
+# glibc images are required. Delete after reading results.
+name: container-probe
+on: { workflow_dispatch: {} }
+permissions: { contents: read }
+jobs:
+  terraform-alpine:
+    runs-on: ubuntu-latest
+    container: hashicorp/terraform:1.15.7          # official = Alpine/musl
+    continue-on-error: true
+    steps:
+      - run: (cat /etc/os-release | head -2) || true; (ldd --version 2>&1 | head -1) || echo "no ldd (musl?)"
+      - uses: actions/checkout@v5                  # the JS-action / node test
+      - run: terraform version
+  debian-glibc:
+    runs-on: ubuntu-latest
+    container: debian:bookworm                     # glibc, no terraform
+    continue-on-error: true
+    steps:
+      - run: (cat /etc/os-release | head -2); (ldd --version 2>&1 | head -1)
+      - uses: actions/checkout@v5
+      - run: echo "checkout OK on glibc; terraform absent (would install)"
+  tflint-image:
+    runs-on: ubuntu-latest
+    container: ghcr.io/terraform-linters/tflint:latest
+    continue-on-error: true
+    steps:
+      - run: (cat /etc/os-release | head -2) || true; (ldd --version 2>&1 | head -1) || echo "musl?"
+      - uses: actions/checkout@v5
+      - run: tflint --version || echo "tflint run failed"
