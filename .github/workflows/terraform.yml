@@ -6,7 +6,6 @@
 # and uses ${REF} placeholders; the workflow_dispatch `secrets_provider` input can override it.
 # `secrets: inherit` lets the reusable workflow forward vars/secrets to the github provider.
 #
-# NOTE: pinned to a branch ref for a pre-merge live test; switch to @v1 after release.
 name: terraform
 
 on:
@@ -31,7 +30,7 @@ permissions:
 
 jobs:
   dev:
-    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/per-env-path-b
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@v2
     secrets: inherit
     with:
       dir: envs/dev
@@ -41,7 +40,7 @@ jobs:
       secrets_provider: ${{ inputs.secrets_provider || '' }}
 
   prod:
-    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/per-env-path-b
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@v2
     secrets: inherit
     with:
       dir: envs/prod

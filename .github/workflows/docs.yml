@@ -3,7 +3,6 @@
 # The doc commit carries [skip ci] and is made with GITHUB_TOKEN, so it never re-triggers a
 # pipeline (no terraform apply, no docs loop).
 #
-# NOTE: pinned to a branch ref for a pre-merge live test; switch to @v1 after release.
 name: docs
 
 on:
@@ -16,7 +15,7 @@ permissions:
 
 jobs:
   terraform-docs:
-    uses: Uaena1711/iac-github/.github/workflows/tf-docs.yml@feat/per-env-path-b
+    uses: Uaena1711/iac-github/.github/workflows/tf-docs.yml@v2
     permissions:
       contents: write
     with:

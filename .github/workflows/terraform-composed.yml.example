@@ -23,7 +23,7 @@ jobs:
         with:
           fetch-depth: 0
       - id: d
-        uses: Uaena1711/iac-github/actions/detect-changes@v1
+        uses: Uaena1711/iac-github/actions/detect-changes@v2
         with:
           workspaces_root: envs
           default_region: us-east-1
@@ -42,11 +42,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       # --- your own pre-plan step here (e.g. infracost) ---
-      - uses: Uaena1711/iac-github/actions/aws-oidc@v1
+      - uses: Uaena1711/iac-github/actions/aws-oidc@v2
         with:
           role_arn: ${{ matrix.stack.role_arn }}
           region: ${{ matrix.stack.region }}
-      - uses: Uaena1711/iac-github/actions/tf-run@v1
+      - uses: Uaena1711/iac-github/actions/tf-run@v2
         with:
           command: plan
           dir: ${{ matrix.stack.dir }}
