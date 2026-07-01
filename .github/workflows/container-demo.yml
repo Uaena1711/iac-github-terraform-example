@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   demo:
-    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/container-image
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@v2
     with:
       dir: envs/container-demo
       environment: dev

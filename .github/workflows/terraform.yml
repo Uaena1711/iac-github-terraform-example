@@ -7,7 +7,6 @@
 # prod (awssm provider) needs the aws CLI for its Secrets Manager lookups, so its plan/apply
 # jobs are overridden to "" (the host, which has aws).
 #
-# NOTE: pinned to a branch ref for a pre-merge live test; switch to @v2 after release.
 name: terraform
 
 on:
@@ -32,7 +31,7 @@ permissions:
 
 jobs:
   dev:
-    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/container-image
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@v2
     secrets: inherit
     with:
       dir: envs/dev
@@ -42,7 +41,7 @@ jobs:
       secrets_provider: ${{ inputs.secrets_provider || '' }}
 
   prod:
-    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/container-image
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@v2
     secrets: inherit
     with:
       dir: envs/prod
