@@ -1,31 +1,29 @@
-# TEMP probe: does actions/checkout + terraform work inside various job container images?
-# Determines whether per-job official (Alpine) tool images are viable on GitHub, or if
-# glibc images are required. Delete after reading results.
+# TEMP probe #2: can the plan-job flow run inside hashicorp/terraform:1.15.7 (Alpine)?
+# Tests OIDC (configure-aws-credentials) + what tools the image has (bash/jq/aws/git).
 name: container-probe
 on: { workflow_dispatch: {} }
-permissions: { contents: read }
+permissions: { id-token: write, contents: read }
 jobs:
-  terraform-alpine:
+  plan-in-terraform-image:
     runs-on: ubuntu-latest
-    container: hashicorp/terraform:1.15.7          # official = Alpine/musl
+    container: hashicorp/terraform:1.15.7
     continue-on-error: true
     steps:
-      - run: (cat /etc/os-release | head -2) || true; (ldd --version 2>&1 | head -1) || echo "no ldd (musl?)"
-      - uses: actions/checkout@v5                  # the JS-action / node test
-      - run: terraform version
-  debian-glibc:
-    runs-on: ubuntu-latest
-    container: debian:bookworm                     # glibc, no terraform
-    continue-on-error: true
-    steps:
-      - run: (cat /etc/os-release | head -2); (ldd --version 2>&1 | head -1)
+      - name: tool inventory
+        run: |
+          echo "os: $(cat /etc/os-release | grep ^ID=)"
+          for t in git bash sh jq aws curl unzip tar node; do
+            if command -v "$t" >/dev/null 2>&1; then echo "HAVE $t"; else echo "MISS $t"; fi
+          done
       - uses: actions/checkout@v5
-      - run: echo "checkout OK on glibc; terraform absent (would install)"
-  tflint-image:
-    runs-on: ubuntu-latest
-    container: ghcr.io/terraform-linters/tflint:latest
-    continue-on-error: true
-    steps:
-      - run: (cat /etc/os-release | head -2) || true; (ldd --version 2>&1 | head -1) || echo "musl?"
-      - uses: actions/checkout@v5
-      - run: tflint --version || echo "tflint run failed"
+      - name: OIDC federate (aws-oidc equivalent)
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::377521353143:role/iac-github-oidc-test
+          aws-region: us-east-1
+      - name: did we get creds?
+        run: |
+          if [ -n "${AWS_ACCESS_KEY_ID:-}" ]; then echo "OIDC OK: creds present"; else echo "OIDC FAILED: no creds"; fi
+      - name: terraform
+        run: terraform version
