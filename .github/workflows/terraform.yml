@@ -1,6 +1,11 @@
 # Per-env consumer: one job per environment calling the catalog's tf-env reusable workflow.
 # dev = auto (its Environment has no reviewers); prod = approval (its Environment has a reviewer).
-# apply runs only when that env's plan has changes, so an unchanged prod never waits.
+# apply runs only when that env's plan has changes, so an unchanged env never waits.
+#
+# Each env's tf-ci.env picks its own secret provider via SECRETS_PROVIDER= (github|awssm|none)
+# and uses ${REF} placeholders; the workflow_dispatch `secrets_provider` input can override it.
+# `secrets: inherit` lets the reusable workflow forward vars/secrets to the github provider.
+#
 # NOTE: pinned to a branch ref for a pre-merge live test; switch to @v1 after release.
 name: terraform
 
@@ -15,6 +20,10 @@ on:
         type: choice
         options: [deploy, destroy]
         default: deploy
+      secrets_provider:
+        description: override each env's file-level SECRETS_PROVIDER (blank = use the file's)
+        type: string
+        default: ""
 
 permissions:
   id-token: write
@@ -23,16 +32,20 @@ permissions:
 jobs:
   dev:
     uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/per-env-path-b
+    secrets: inherit
     with:
       dir: envs/dev
       environment: dev
       default_region: us-east-1
       mode: ${{ inputs.mode || 'deploy' }}
+      secrets_provider: ${{ inputs.secrets_provider || '' }}
 
   prod:
     uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/per-env-path-b
+    secrets: inherit
     with:
       dir: envs/prod
       environment: prod
       default_region: us-east-1
       mode: ${{ inputs.mode || 'deploy' }}
+      secrets_provider: ${{ inputs.secrets_provider || '' }}
