@@ -1,12 +1,7 @@
-# Manual demo: run every tf-env job inside one image (default: the official terraform image).
+# Manual demo: EACH JOB runs in its OWN image (different containers per job).
+#   secret_scan -> a gitleaks image   |   lint/plan/apply -> a terraform image   |   resolve -> host
 name: container-demo
-on:
-  workflow_dispatch:
-    inputs:
-      image:
-        description: image to run all jobs in
-        type: string
-        default: hashicorp/terraform:1.15.7
+on: { workflow_dispatch: {} }
 permissions:
   id-token: write
   contents: read
@@ -17,4 +12,8 @@ jobs:
       dir: envs/container-demo
       environment: dev
       default_region: us-east-1
-      container_image: ${{ inputs.image }}
+      secret_scan_image: zricethezav/gitleaks:latest   # gitleaks baked in (reused, not installed)
+      lint_image: hashicorp/terraform:1.15.7           # terraform for fmt; tflint auto-installs
+      plan_image: hashicorp/terraform:1.15.7           # pure terraform
+      apply_image: hashicorp/terraform:1.15.7
+      # resolve_image omitted -> runs on the host
