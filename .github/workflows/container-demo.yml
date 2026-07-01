@@ -1,0 +1,20 @@
+# Manual demo: run every tf-env job inside one image (default: the official terraform image).
+name: container-demo
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: image to run all jobs in
+        type: string
+        default: hashicorp/terraform:1.15.7
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  demo:
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/container-image
+    with:
+      dir: envs/container-demo
+      environment: dev
+      default_region: us-east-1
+      container_image: ${{ inputs.image }}
