@@ -24,7 +24,7 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_secret_note"></a> [secret\_note](#input\_secret\_note) | Injected as TF\_VAR\_secret\_note by the pipeline (prod: from AWS Secrets Manager). | `string` | n/a | yes |
+| <a name="input_secret_note"></a> [secret\_note](#input\_secret\_note) | Injected as TF\_VAR\_secret\_note by the pipeline (from a GitHub secret). | `string` | n/a | yes |
 
 ## Outputs
 
