@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   dev:
-    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/cfn-container-portable
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@v2
     secrets: inherit
     with:
       dir: envs/dev
@@ -38,7 +38,7 @@ jobs:
       secrets_provider: ${{ inputs.secrets_provider || '' }}
 
   prod:
-    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@feat/cfn-container-portable
+    uses: Uaena1711/iac-github/.github/workflows/tf-env.yml@v2
     secrets: inherit
     with:
       dir: envs/prod
