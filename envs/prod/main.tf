@@ -4,6 +4,6 @@ module "demo" {
   source = "../../modules/ssm-demo"
 
   name  = "/iac-github/demo/prod"
-  value = "hello-prod-v2"
+  value = "hello-prod-v3"
   tags  = { env = "prod", managed_by = "iac-github" }
 }
