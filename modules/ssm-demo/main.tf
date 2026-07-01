@@ -10,10 +10,12 @@ terraform {
   }
 }
 
+# The sensitive input lands in a SecureString (encrypted with the default aws/ssm KMS key),
+# so it's protected at rest as well as in transit. `note` is a normal variable shown in plan.
 resource "aws_ssm_parameter" "this" {
   name        = var.name
-  type        = "String"
-  value       = var.value
-  description = "managed by iac-github"
+  type        = "SecureString"
+  value       = var.secret_note
+  description = var.note
   tags        = var.tags
 }
