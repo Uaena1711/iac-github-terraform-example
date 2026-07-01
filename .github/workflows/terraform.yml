@@ -2,11 +2,8 @@
 # dev = auto (its Environment has no reviewers); prod = approval (its Environment has a reviewer).
 # apply runs only when that env's plan has changes, so an unchanged env never waits.
 #
-# The catalog ships sensible per-job container images by default; you override only when needed.
-# dev (github provider) runs on the defaults (jq auto-installs in the terraform image).
-# prod (awssm provider) needs the aws CLI for its Secrets Manager lookups, so its plan/apply
-# jobs are overridden to "" (the host, which has aws).
-#
+# Every job runs in a container by default (the catalog ships per-job images); both envs use
+# the github provider, so jq auto-installs in the terraform image — nothing runs on the host.
 name: terraform
 
 on:
@@ -49,5 +46,3 @@ jobs:
       default_region: us-east-1
       mode: ${{ inputs.mode || 'deploy' }}
       secrets_provider: ${{ inputs.secrets_provider || '' }}
-      plan_image: ""    # awssm needs the aws CLI -> run these on the host
-      apply_image: ""
